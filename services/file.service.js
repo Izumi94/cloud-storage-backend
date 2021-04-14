@@ -1,12 +1,12 @@
 const fs = require('fs');
-const path = require ('path');
+const path = require('path');
 
 class FileService {
   createDir(file) {
     
-    const folderName = path.resolve (__dirname, '../files')
+    const folderName = path.resolve(__dirname, '../files')
 
-    const filePath = `${folderName}\\${file.user}\\${file.path}`;
+    const filePath = `${folderName}/${file.user}/${file.path}`;
 
     return new Promise((resolve, reject) => {
       try {
