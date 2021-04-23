@@ -1,3 +1,4 @@
+
 const fileService = require('../services/file.service');
 const User = require('../models/User');
 const File = require('../models/File');
@@ -70,11 +71,17 @@ class FileController {
 
       const type = file.name.split('.').pop();
 
+      let filePath = file.name;
+
+      if (parent) {
+        filePath = `${parent.path}/${file.name}`
+      }
+
       const dbFile = new File({
         name: file.name,
         type,
         size: file.size,
-        path: parent?.path,
+        path: filePath,
         parent: parent?._id,
         user: user._id,
       });
@@ -86,6 +93,41 @@ class FileController {
     } catch (e) {
       console.log(e);
       res.status(500).json({ message: 'Ошибка загрузки файла' });
+    }
+  }
+
+  async downloadFile(req, res) {
+    try {
+      const file = await File.findOne({ _id: req.query.id, user: req.user.id });
+
+      const folderName = path.resolve(__dirname, '../files');
+
+      const pathFolder = `${folderName}/${req.user.id}/${file.path}/${file.name}`;
+
+      if (fs.existsSync(pathFolder)) {
+        return res.download(pathFolder);
+      }
+
+      return res.status(400).json({ message: 'Файл не был найден для скачивания' })
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: 'Download error' });
+    }
+  }
+
+  async deleteFile(req, res) {
+    try {
+      const file = await File.findOne({ _id: req.query.id, user: req.user.id })
+      if (file) {
+        return res.status(400).json({ message: 'Файл для удаления не был найден' })
+      }
+      fileService.deleteFile(file);
+
+      await file.remove();
+
+      return res.json({message: 'Файл был успешно удален'})
+      
+    } catch (err) {
     }
   }
 }

@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 class FileService {
+  getPath(file) {
+
+  }
   createDir(file) {
     
     const folderName = path.resolve(__dirname, '../files')
@@ -20,6 +23,12 @@ class FileService {
         return reject(err);
       }
     });
+  }
+  deleteFile(file) {
+    const folderName = path.resolve(__dirname, '../files');
+    const filePath = `${folderName}/${file.user}/${file.path}`;
+    const path = this.getPath(file);
+    
   }
 }
 
